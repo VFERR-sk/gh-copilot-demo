@@ -5,3 +5,8 @@ export interface Album {
   price: number
   image_url: string
 }
+
+export interface CartItem {
+  album: Album
+  addedAt: Date
+}

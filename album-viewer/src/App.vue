@@ -1,8 +1,13 @@
 <template>
   <div class="app">
     <header class="header">
-      <h1>🎵 Album Collection</h1>
-      <p>Discover amazing music albums</p>
+      <div class="header-content">
+        <div>
+          <h1>🎵 Album Collection</h1>
+          <p>Discover amazing music albums</p>
+        </div>
+        <CartIcon :count="cartCount" @click="cartOpen = true" />
+      </div>
     </header>
 
     <main class="main">
@@ -20,10 +25,21 @@
         <AlbumCard 
           v-for="album in albums" 
           :key="album.id" 
-          :album="album" 
+          :album="album"
+          :inCart="isInCart(album.id)"
+          @addToCart="addToCart"
         />
       </div>
     </main>
+
+    <CartDrawer
+      :isOpen="cartOpen"
+      :cartItems="cartItems"
+      :cartTotal="cartTotal"
+      @close="cartOpen = false"
+      @removeItem="removeFromCart"
+      @clearCart="clearCart"
+    />
   </div>
 </template>
 
@@ -31,11 +47,17 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import AlbumCard from './components/AlbumCard.vue'
+import CartIcon from './components/CartIcon.vue'
+import CartDrawer from './components/CartDrawer.vue'
 import type { Album } from './types/album'
+import { useCart } from './composables/useCart'
 
 const albums = ref<Album[]>([])
 const loading = ref<boolean>(true)
 const error = ref<string | null>(null)
+const cartOpen = ref<boolean>(false)
+
+const { cartItems, cartCount, cartTotal, isInCart, addToCart, removeFromCart, clearCart } = useCart()
 
 const fetchAlbums = async (): Promise<void> => {
   try {
@@ -66,6 +88,15 @@ onMounted(() => {
   text-align: center;
   margin-bottom: 3rem;
   color: white;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .header h1 {
